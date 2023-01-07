@@ -21,12 +21,17 @@
 #define SS_DT_MILIS (10)                            /* 10 ms */
 #define SS_DT       float_prec(SS_DT_MILIS/1000.)   /* Sampling time */
 
-// MOJE WIELKOŚCI
+
+
+//Parametry macierzy
 
 #define HY (5)
 #define HU (2)
 #define NA (3)
 #define NB (1)
+
+
+
 /* MPC Parameters */
 #define MPC_HP_LEN      (4)
 #define MPC_HU_LEN      (3)
