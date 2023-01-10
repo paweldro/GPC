@@ -41,7 +41,7 @@ void setup() {
 
 
     
-    //Przypisanie wartości do macierzy CA
+    //Przypisanie wartości do macierzy CA z karty SD
 
     myFile = SD.open("CA.txt");
 
@@ -62,10 +62,10 @@ void setup() {
     }
   }  
   else {
-    Serial.println("Cannot open file!");
+    Serial.println("Nie można otworzyć pliku: CA.txt!");
   } 
 
-    //Przypisanie wartości do macierzy CB
+    //Przypisanie wartości do macierzy CB z karty SD
     
     myFile = SD.open("CB.txt");
 
@@ -86,7 +86,7 @@ void setup() {
     }
   }  
   else {
-    Serial.println("Cannot open file!");
+    Serial.println("Nie można otworzyć pliku: CB.txt!");
   }    
 
     //Przypisanie wartości do macierzy HA z karty SD
@@ -110,10 +110,10 @@ void setup() {
     }
   }  
   else {
-    Serial.println("Cannot open file!");
+    Serial.println("Nie można otworzyć pliku: HA.txt!");
   } 
 
-    //Przypisanie wartości do macierzy HB
+    //Przypisanie wartości do macierzy HB z karty SD
     
     myFile = SD.open("HB.txt");
 
@@ -134,7 +134,7 @@ void setup() {
     }
   }  
   else {
-    Serial.println("Cannot open file!");
+    Serial.println("Nie można otworzyć pliku: HB.txt!");
   }       
 
     //Obliczanie macierzy H, P1, P2
@@ -163,7 +163,7 @@ void loop() {
 
 void SPEW_THE_ERROR(char const * str)
 {
-  //Funkcja potrzebna do działania biblioteki mpc.h
+  //Funkcja potrzebna do działania biblioteki mpc.h/matrix.h
   
     #if (SYSTEM_IMPLEMENTATION == SYSTEM_IMPLEMENTATION_PC)
         cout << (str) << endl;
