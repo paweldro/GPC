@@ -23,12 +23,14 @@
 
 
 
+
 //Parametry macierzy
 
 #define HY (5)
 #define HU (2)
 #define NA (3)
 #define NB (1)
+
 
 
 

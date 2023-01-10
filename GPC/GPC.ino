@@ -4,6 +4,14 @@
 #include "matrix.h"
 #include "mpc.h"
 
+//obsługa karty SD
+#include <SD.h>
+#include <SPI.h>
+
+File myFile;
+
+const int chipSelect = BUILTIN_SDCARD;
+
 
 //Deklaracja macierzy
 Matrix CA(HY, HY);
@@ -22,38 +30,112 @@ void setup() {
     while(!Serial) {}
     pinMode(LED_BUILTIN, OUTPUT);
     
+    //inicjalizacja karty SD
+    Serial.print("Inicjalizacja karty SD: ");
+
+    if (!SD.begin(chipSelect)) {
+      Serial.println("Nieudana");
+      return;
+    }
+    Serial.println("Udana.");
+
+
     
     //Przypisanie wartości do macierzy CA
 
-    CA[0][0] =  1.0000;      CA[0][1] = 0.0000;      CA[0][2] =  0.0000;      CA[0][3] = 0.0000;     CA[0][4] = 0.0000;
-    CA[1][0] =  -2.4170;      CA[1][1] = 1.0000;      CA[1][2] = 0.0000;      CA[1][3] = 0.0000;     CA[1][4] = 0.0000;
-    CA[2][0] = 1.8339;      CA[2][1] = -2.4170;      CA[2][2] = 1.0000;      CA[2][3] = 0.0000;     CA[2][4] = 0.0000;
-    CA[3][0] =  -0.4169;      CA[3][1] =  1.8339;      CA[3][2] =  -2.4170;      CA[3][3] =1.0000;     CA[3][4] = 0.0000;
-    CA[4][0] =  0.0000;      CA[4][1] =  -0.4169;      CA[4][2] =  1.8339;      CA[4][3] =-2.4170;     CA[4][4] = 1.0000;
+    myFile = SD.open("CA.txt");
+
+    if (myFile) 
+  {
+    while (myFile.available())
+    {  
+      for(int i=0;i<HY;i++)
+      {
+        
+        for(int j=0;j<HY;j++)
+        {
+          float myFloat = myFile.parseFloat();
+          CA[i][j]=myFloat;
+        }
+      }
+      myFile.close();  
+    }
+  }  
+  else {
+    Serial.println("Cannot open file!");
+  } 
 
     //Przypisanie wartości do macierzy CB
     
-    CB[0][0] =  0.0119;      CB[0][1] = 0.0000;     
-    CB[1][0] =  0.0089;      CB[1][1] = 0.0119;      
-    CB[2][0] =  0.0000;      CB[2][1] = 0.0089;      
-    CB[3][0] =  0.0000;      CB[3][1] =  0.0000;     
-    CB[4][0] =  0.0000;      CB[4][1] =  0.0000;    
+    myFile = SD.open("CB.txt");
 
-    //Przypisanie wartości do macierzy HA
+    if (myFile) 
+  {
+    while (myFile.available())
+    {  
+      for(int i=0;i<HY;i++)
+      {
+        
+        for(int j=0;j<HU;j++)
+        {
+          float myFloat = myFile.parseFloat();
+          CB[i][j]=myFloat;
+        }
+      }
+      myFile.close();  
+    }
+  }  
+  else {
+    Serial.println("Cannot open file!");
+  }    
+
+    //Przypisanie wartości do macierzy HA z karty SD
     
-    HA[0][0] =  -2.4170;      HA[0][1] =  1.8339;      HA[0][2] =  -0.4169;     
-    HA[1][0] =   1.8339;      HA[1][1] = -0.4169;      HA[1][2] = 0.0000;     
-    HA[2][0] = -0.4169;      HA[2][1] = 0.0000;       HA[2][2] =0.0000;      
-    HA[3][0] =  0.0000;        HA[3][1] =  0.0000;       HA[3][2] = 0.0000;      
-    HA[4][0] =  0.0000;      HA[4][1] = 0.0000;        HA[4][2] =0.0000;  
+    myFile = SD.open("HA.txt");
+
+    if (myFile) 
+  {
+    while (myFile.available())
+    {  
+      for(int i=0;i<HY;i++)
+      {
+        
+        for(int j=0;j<NA;j++)
+        {
+          float myFloat = myFile.parseFloat();
+          HA[i][j]=myFloat;
+        }
+      }
+      myFile.close();  
+    }
+  }  
+  else {
+    Serial.println("Cannot open file!");
+  } 
 
     //Przypisanie wartości do macierzy HB
     
-    HB[0][0] =  0.0089;     
-    HB[1][0] =   0.0000;          
-    HB[2][0] = 0.0000;        
-    HB[3][0] =  0.0000;            
-    HB[4][0] =  0.0000;     
+    myFile = SD.open("HB.txt");
+
+    if (myFile) 
+  {
+    while (myFile.available())
+    {  
+      for(int i=0;i<HY;i++)
+      {
+        
+        for(int j=0;j<NB;j++)
+        {
+          float myFloat = myFile.parseFloat();
+          HB[i][j]=myFloat;
+        }
+      }
+      myFile.close();  
+    }
+  }  
+  else {
+    Serial.println("Cannot open file!");
+  }       
 
     //Obliczanie macierzy H, P1, P2
     
@@ -74,6 +156,7 @@ void loop() {
    
 
 }
+
 
 
 
