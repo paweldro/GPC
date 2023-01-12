@@ -43,99 +43,20 @@ void setup() {
     
     //Przypisanie wartości do macierzy CA z karty SD
 
-    myFile = SD.open("CA.txt");
-
-    if (myFile) 
-  {
-    while (myFile.available())
-    {  
-      for(int i=0;i<HY;i++)
-      {
-        
-        for(int j=0;j<HY;j++)
-        {
-          float myFloat = myFile.parseFloat();
-          CA[i][j]=myFloat;
-        }
-      }
-      myFile.close();  
-    }
-  }  
-  else {
-    Serial.println("Nie można otworzyć pliku: CA.txt!");
-  } 
-
+    readmatrix("CA.txt", CA, HY, HY);
+    
     //Przypisanie wartości do macierzy CB z karty SD
     
-    myFile = SD.open("CB.txt");
-
-    if (myFile) 
-  {
-    while (myFile.available())
-    {  
-      for(int i=0;i<HY;i++)
-      {
-        
-        for(int j=0;j<HU;j++)
-        {
-          float myFloat = myFile.parseFloat();
-          CB[i][j]=myFloat;
-        }
-      }
-      myFile.close();  
-    }
-  }  
-  else {
-    Serial.println("Nie można otworzyć pliku: CB.txt!");
-  }    
-
+    readmatrix("CB.txt", CB, HY, HU);
+    
     //Przypisanie wartości do macierzy HA z karty SD
     
-    myFile = SD.open("HA.txt");
-
-    if (myFile) 
-  {
-    while (myFile.available())
-    {  
-      for(int i=0;i<HY;i++)
-      {
-        
-        for(int j=0;j<NA;j++)
-        {
-          float myFloat = myFile.parseFloat();
-          HA[i][j]=myFloat;
-        }
-      }
-      myFile.close();  
-    }
-  }  
-  else {
-    Serial.println("Nie można otworzyć pliku: HA.txt!");
-  } 
+    readmatrix("HA.txt", HA, HY, NA);
 
     //Przypisanie wartości do macierzy HB z karty SD
     
-    myFile = SD.open("HB.txt");
-
-    if (myFile) 
-  {
-    while (myFile.available())
-    {  
-      for(int i=0;i<HY;i++)
-      {
+    readmatrix("HB.txt", HB, HY, NB);
         
-        for(int j=0;j<NB;j++)
-        {
-          float myFloat = myFile.parseFloat();
-          HB[i][j]=myFloat;
-        }
-      }
-      myFile.close();  
-    }
-  }  
-  else {
-    Serial.println("Nie można otworzyć pliku: HB.txt!");
-  }       
 
     //Obliczanie macierzy H, P1, P2
     
@@ -158,6 +79,32 @@ void loop() {
 }
 
 
+void readmatrix(char const *filename, Matrix &matrix, int x, int y)
+{
+     myFile = SD.open(filename);
+
+    if (myFile) 
+  {
+    while (myFile.available())
+    {  
+      for(int i=0;i<x;i++)
+      {
+        
+        for(int j=0;j<y;j++)
+        {
+          float myFloat = myFile.parseFloat();
+          matrix[i][j]=myFloat;
+        }
+      }
+      myFile.close();  
+    }
+  }  
+  else {
+    Serial.println("Nie można otworzyć pliku: " + String(filename));
+   
+  }       
+ 
+}
 
 
 

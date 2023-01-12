@@ -26,8 +26,8 @@
 
 //Parametry macierzy
 
-#define HY (5)
-#define HU (2)
+#define HY (32)
+#define HU (32)
 #define NA (3)
 #define NB (1)
 
@@ -54,7 +54,7 @@
 
 
 /* Change this size based on the biggest matrix you will use */
-#define MATRIX_MAXIMUM_SIZE     (28)
+#define MATRIX_MAXIMUM_SIZE     (32)
 
 /* Define this to enable matrix bounds checking */
 #define MATRIX_USE_BOUNDS_CHECKING
