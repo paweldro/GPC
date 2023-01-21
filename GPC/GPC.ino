@@ -23,7 +23,21 @@ Matrix H(HY, HU);
 Matrix P1(HY, NA);
 Matrix P2(HY,NB);
 
+Matrix W(HU, HU);
+Matrix I(HU, HU);
+Matrix jed(1 ,HU);
 
+Matrix YR(HY, 1);  //zmiana wartości od potencjomnetru 
+Matrix Ywlewo(NA, 1);
+Matrix deltaUwlewo(NB, 1);
+Matrix V(HU, 1);
+
+Matrix deltaUk(1, 1);
+
+Matrix UK(1, 1);
+Matrix UKminusjeden(1, 1);
+
+Matrix macierzdoprzesuwania(HU, HU);
 void setup() {
     /* serial to display data */
     Serial.begin(115200);
@@ -56,7 +70,14 @@ void setup() {
     //Przypisanie wartości do macierzy HB z karty SD
     
     readmatrix("HB.txt", HB, HY, NB);
-        
+
+    //Przypisanie wartości do macierzy I z karty SD
+    
+    readmatrix("I.txt", I, HU, HU);
+
+    //Przypisanie wartości do macierzy I z karty SD
+    
+    readmatrix("jed.txt", jed, 1, HU);
 
     //Obliczanie macierzy H, P1, P2
     
@@ -66,10 +87,28 @@ void setup() {
     
     //Wyświetlanie macierzy P2
     
-    P2.vPrintFull();
+    //P2.vPrintFull();
+    float p = 0.5;
+    W = 2*(H.Transpose()*H+p*I);
     
-}
 
+    V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo);
+
+    for(int i = 0; i<HU-1; i++ ){
+      macierzdoprzesuwania[i][i+1]=1;
+      
+    }
+
+       for(int i = 0; i<HU; i++ ){
+      YR[i][0]=i+1;
+      
+    }
+    macierzdoprzesuwania[HY-1][0]=1;
+    YR.vPrintFull();
+    YR = macierzdoprzesuwania*YR;
+    YR.vPrintFull();
+   }
+  
 
 void loop() {
   //loop
