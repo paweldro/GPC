@@ -12,7 +12,7 @@ File myFile;
 
 const int chipSelect = BUILTIN_SDCARD;
 
-
+int steps = 0;
 //Deklaracja macierzy
 Matrix CA(HY, HY);
 Matrix CB(HY, HU);
@@ -26,16 +26,26 @@ Matrix P2(HY,NB);
 Matrix W(HU, HU);
 Matrix I(HU, HU);
 Matrix jed(1 ,HU);
+Matrix pomocnicza(1, HU);
 
 Matrix YR(HY, 1);  //zmiana wartości od potencjomnetru 
 Matrix Ywlewo(NA, 1);
 Matrix deltaUwlewo(NB, 1);
 Matrix V(HU, 1);
 
+//delta u przewidujace
+Matrix deltaUwprawo(HU, 1);
+
 Matrix deltaUk(1, 1);
 
 Matrix UK(1, 1);
 Matrix UKminusjeden(1, 1);
+
+//wartość zadana
+int wz = 20;
+
+//chwilowe wyjscie
+Matrix wyjscie(1, 1);
 
 Matrix macierzdoprzesuwania(HU, HU);
 void setup() {
@@ -90,31 +100,79 @@ void setup() {
     //P2.vPrintFull();
     float p = 0.5;
     W = 2*(H.Transpose()*H+p*I);
+    pomocnicza = -1*jed*W.Invers();
+
+    //V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo); //loop dodane
+    //deltaUk = pomocnicza*V; //loop dodane
     
-
-    V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo);
-
+    //deltaUwprawo[0][0]= deltaUk[0][0];
+    
+    //generowanie macierzy do przesuwania
     for(int i = 0; i<HU-1; i++ ){
       macierzdoprzesuwania[i][i+1]=1;
       
     }
-
+    //generowanie macierzy YR
        for(int i = 0; i<HU; i++ ){
-      YR[i][0]=i+1;
+      YR[i][0]=wz;
       
     }
-    macierzdoprzesuwania[HY-1][0]=1;
-    YR.vPrintFull();
-    YR = macierzdoprzesuwania*YR;
-    YR.vPrintFull();
+      
+    //YR = YR.Transpose();
+    //macierzdoprzesuwania[HY-1][0]=1;
+   
+    //YR = YR*macierzdoprzesuwania;
+    //YR = YR.Transpose();
+
+    
+    /*//przesuwanie macierzy Ywlewo
+    for(int i = NA-1; i>0; i-- )
+    { 
+      Ywlewo[i][0]=Ywlewo[i-1][0];
+      }
+     Ywlewo[0][0]=wyjscie[0][0];*/
+
+    
+    
+    //wyliczanie delta u w lewo deltaUwlewo trzeba dopasować do transmitancji 
+    //deltaUwlewo[0][0] =deltaUk[0][0];
+    
+    //Ywlewo.vPrintFull();
+
+    //obliczanie chwilowego wyjscia - to na końcu
+    //wyjscie=H*deltaUwprawo+P1*Ywlewo+P2*deltaUwlewo;
+
+    
    }
   
 
 void loop() {
   //loop
-   
-   
+  if(steps < 40)
+  {
+  V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo); //obliczanie wartosci V
+  deltaUk = pomocnicza*V; //obliczanie wartosci delta Uk
 
+  
+  deltaUwprawo[0][0]= deltaUk[0][0]; //zweryfikowc bo wpisujemy tylko pierwsza wartosc, reszta to zera
+  
+  wyjscie=H*deltaUwprawo+P1*Ywlewo+P2*deltaUwlewo; //obliczanie chwilowego wyjscia
+
+  //przesuwanie
+  //przesuwanie macierzy Ywlewo
+    for(int i = NA-1; i>0; i-- )
+    { 
+      Ywlewo[i][0]=Ywlewo[i-1][0];
+      }
+     Ywlewo[0][0]=wyjscie[0][0];
+   
+   //wyliczanie delta u w lewo deltaUwlewo trzeba dopasować do transmitancji 
+    deltaUwlewo[0][0] =deltaUk[0][0];
+    Serial.println(wyjscie[0][0]);
+    //wyjscie.vPrintFull();
+    delay(1000);
+    steps = steps + 1;
+  }
 }
 
 
