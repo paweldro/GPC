@@ -102,20 +102,27 @@ void setup() {
  // Start up the library 
  sensors.begin();
  sensors.requestTemperatures();
- start_pom = sensors.getTempCByIndex(0);
 
-    wyjscie[0][0] = sensors.getTempCByIndex(0);
- // Serial.println("wyjscie: ");
-  //Serial.println(wyjscie[0][0]);
+
+
+//start_pom = 23;
+ //wyjscie[0][0] = 23;
+
+
+  start_pom = sensors.getTempCByIndex(0);
+  wyjscie[0][0] = sensors.getTempCByIndex(0);
+
+
 
   //przesuwanie macierzy Ywlewo
     for(int i = NA-1; i>-1; i-- )
     { 
       
-      Ywlewo[i][0]=wyjscie[0][0];
+      Ywlewo[i][0]=wyjscie[0][0]- start_pom;
       }
       
-
+    Serial.print("Ywlewo: ");
+    Ywlewo.vPrintFull();   
 
     
     //inicjalizacja karty SD
@@ -158,16 +165,27 @@ void setup() {
     H = CA.Invers() * CB;
     P1 = -1* CA.Invers() * HA;
     P2 =  CA.Invers() * HB;
+
+
+    Serial.print("H: ");
+    H.vPrintFull();
     
-    //Wyświetlanie macierzy P2
+    Serial.print("P1: ");
+    P1.vPrintFull();
+
+    Serial.print("P2: ");
+    P2.vPrintFull();   
     
-    //P2.vPrintFull();
-    float p = 0.1;
+    
+    float p = 5;
     W = 2*(H.Transpose()*H+p*I);
     pomocnicza = -1*jed*W.Invers();
 
-    //V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo); //loop dodane
-    //deltaUk = pomocnicza*V; //loop dodane
+    Serial.print("W: ");
+    W.vPrintFull();   
+
+    Serial.print("pomocnicza: ");
+    pomocnicza.vPrintFull();   
     
     //deltaUwprawo[0][0]= deltaUk[0][0];
     
@@ -177,6 +195,9 @@ void setup() {
       
     }
 
+    
+    pom = sensors.getTempCByIndex(0);
+    Serial.print(pom);
     Serial.print("Pomiar:   ");
     Serial.print("Procent:  ");
     Serial.print("delta uk:  ");
@@ -184,6 +205,7 @@ void setup() {
     
     UK[0][0] = 0;
     deltaUkpoprz[0][0] = 0;
+   
     
    }
   
@@ -192,6 +214,7 @@ void loop() {
   //loop
 
 
+pom = sensors.getTempCByIndex(0);
 
 sensors.requestTemperatures(); // Send the command to get temperature readings 
  while(pierwszy){
@@ -207,7 +230,7 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
      lcd.setCursor(0,0); 
      lcd.print("Zadawana T= ");
      for(int i = 0; i<HU; i++ ){
-      YR[i][0]=zadana;
+      YR[i][0]=zadana - start_pom;
       
     }
      lcd.print(zadana);
@@ -235,7 +258,7 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
 
           //generowanie macierzy YR
        for(int i = 0; i<HU; i++ ){
-      YR[i][0]=zadana;
+      YR[i][0]=zadana - start_pom;
       
     }
       delay(1000);
@@ -254,23 +277,26 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
  lcd.print(sensors.getTempCByIndex(0));
  lcd.print("C");
 
-  pom = sensors.getTempCByIndex(0);
+  
     
   
   V = -2*H.Transpose()*(YR-P1*Ywlewo-P2*deltaUwlewo); //obliczanie wartosci V
   deltaUk = pomocnicza*V; //obliczanie wartosci delta Uk
-  //Serial.println("deltauk: ");
- // Serial.println(deltaUk[0][0]);
 
-
+   deltaUwprawo[0][0]= deltaUk[0][0]; //zweryfikowc bo wpisujemy tylko pierwsza wartosc, reszta to zera
+  //deltaUwprawo.vPrintFull();
+ 
   
 
-  deltaUwprawo[0][0]= deltaUk[0][0]; //zweryfikowc bo wpisujemy tylko pierwsza wartosc, reszta to zera
-  
-  //wyjscie=H*deltaUwprawo+P1*Ywlewo+P2*deltaUwlewo; //obliczanie chwilowego wyjscia
+//  Serial.print("V: ");
+ //  V.vPrintFull();   
+
+    
+      
   wyjscie[0][0] = sensors.getTempCByIndex(0);
- // Serial.println("wyjscie: ");
-  //Serial.println(wyjscie[0][0]);
+  wyjscie[0][0]= wyjscie[0][0] - start_pom;
+ 
+  //wyjscie=H*deltaUwprawo+P1*Ywlewo+P2*deltaUwlewo; //obliczanie chwilowego wyjscia
 
   //przesuwanie macierzy Ywlewo
     for(int i = NA-1; i>0; i-- )
@@ -278,24 +304,21 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
       Ywlewo[i][0]=Ywlewo[i-1][0];
       }
        Ywlewo[0][0]=wyjscie[0][0];
+
+   // Serial.print("Ywlewo: ");
+   //Ywlewo.vPrintFull();  
    
    //wyliczanie delta u w lewo deltaUwlewo trzeba dopasować do transmitancji 
     deltaUwlewo[0][0] =deltaUk[0][0];
    
 
 
-
-    
-    //procent = (2.6408*deltaUk[0][0])-73.3237; // z temp na % wypelnienia
-// if(deltaUk[0][0]<=start_pom){
-  //  procent = 0;
-//}else{
     deltaUkpoprz[0][0] = UK[0][0];
     UK[0][0]= UK[0][0]+deltaUk[0][0];
     
     
     procent = UK[0][0];
-    //procent = (0.1241*(UK[0][0])-9.1556);
+   
     if(procent<0)
     {
       procent = 0;
@@ -309,22 +332,24 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
       deltaUk[0][0] =UK[0][0]- deltaUkpoprz[0][0];
       
     }
-//}
- // wyjscie=H*deltaUwprawo+P1*Ywlewo+P2*deltaUwlewo; //obliczanie chwilowego wyjscia
-  //Serial.println("UK: ");
-  //Serial.println(UK[0][0]);
+obliczenia = (sqrt(UK[0][0]*10*22/100)/14.55)*255; // z % na syg 0-255
    Serial.print(wyjscie[0][0]);
    Serial.print("     ");
-    Serial.print(procent);
+    Serial.print(obliczenia);
     Serial.print("      ");
     Serial.print(deltaUk[0][0]);
     Serial.print("      ");
     Serial.println(UK[0][0]);
- obliczenia = (procent/100)*255; // z % na syg 0-255
+ //obliczenia = (sqrt(UK[0][0]*10*22/100)/15)*255; // z % na syg 0-255
+ //Serial.print(obliczenia);
+ 
+ 
+ 
+ 
+ Serial.print(obliczenia);
  analogWrite(0,obliczenia); // wyjscie
-  // Serial.println("procent: ");
-  //Serial.println(procent); 
-  // delay(100); 
+ 
+   //delay(100); 
   delay(60000);
 
 
