@@ -5,7 +5,7 @@
 #include <elapsedMillis.h>
 #include "konfig.h"
 #include "matrix.h"
-#include "mpc.h"
+
 
 //obsługa karty SD
 #include <SD.h>
@@ -121,8 +121,8 @@ void setup() {
       Ywlewo[i][0]=wyjscie[0][0]- start_pom;
       }
       
-    Serial.print("Ywlewo: ");
-    Ywlewo.vPrintFull();   
+  //  Serial.print("Ywlewo: ");
+   // Ywlewo.vPrintFull();   
 
     
     //inicjalizacja karty SD
@@ -167,25 +167,25 @@ void setup() {
     P2 =  CA.Invers() * HB;
 
 
-    Serial.print("H: ");
-    H.vPrintFull();
+   // Serial.print("H: ");
+   // H.vPrintFull();
     
-    Serial.print("P1: ");
-    P1.vPrintFull();
+   // Serial.print("P1: ");
+   // P1.vPrintFull();
 
-    Serial.print("P2: ");
-    P2.vPrintFull();   
+   // Serial.print("P2: ");
+   // P2.vPrintFull();   
     
     
     float p = 5;
     W = 2*(H.Transpose()*H+p*I);
     pomocnicza = -1*jed*W.Invers();
 
-    Serial.print("W: ");
-    W.vPrintFull();   
+    //Serial.print("W: ");
+   // W.vPrintFull();   
 
-    Serial.print("pomocnicza: ");
-    pomocnicza.vPrintFull();   
+    //Serial.print("pomocnicza: ");
+    //pomocnicza.vPrintFull();   
     
     //deltaUwprawo[0][0]= deltaUk[0][0];
     
@@ -197,9 +197,10 @@ void setup() {
 
     
     pom = sensors.getTempCByIndex(0);
-    Serial.print(pom);
+    Serial.print("Temperatura początkowa: ");
+    Serial.println(pom);
     Serial.print("Pomiar:   ");
-    Serial.print("Procent:  ");
+    Serial.print("PWM:  ");
     Serial.print("delta uk:  ");
     Serial.println("uk:  ");
     
@@ -332,7 +333,8 @@ sensors.requestTemperatures(); // Send the command to get temperature readings
       deltaUk[0][0] =UK[0][0]- deltaUkpoprz[0][0];
       
     }
-obliczenia = (sqrt(UK[0][0]*10*22/100)/14.55)*255; // z % na syg 0-255
+//obliczenia = (sqrt(UK[0][0]*10*22/100)/15)*255; // z % na syg 0-255  // alternatywne wyliczanie pwm 
+obliczenia = (sqrt(UK[0][0])*25.5); // z % na syg 0-255
    Serial.print(wyjscie[0][0]);
    Serial.print("     ");
     Serial.print(obliczenia);
@@ -340,13 +342,13 @@ obliczenia = (sqrt(UK[0][0]*10*22/100)/14.55)*255; // z % na syg 0-255
     Serial.print(deltaUk[0][0]);
     Serial.print("      ");
     Serial.println(UK[0][0]);
- //obliczenia = (sqrt(UK[0][0]*10*22/100)/15)*255; // z % na syg 0-255
+ 
  //Serial.print(obliczenia);
  
  
  
  
- Serial.print(obliczenia);
+ //Serial.print(obliczenia);
  analogWrite(0,obliczenia); // wyjscie
  
    //delay(100); 
